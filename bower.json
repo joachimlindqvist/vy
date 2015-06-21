@@ -1,0 +1,23 @@
+{
+  "name": "vy",
+  "version": "0.0.1",
+  "authors": [
+    "Joachim Lindqvist <lindqvist.joachim@gmail.com>"
+  ],
+  "description": "Simple Video Player",
+  "main": "build/vy.js",
+  "keywords": [
+    "video-player"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.1.4"
+  }
+}
