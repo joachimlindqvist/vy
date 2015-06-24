@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     coffee: {
       coffee_to_js: {
         options: {
-          bare: true,
+          bare: false,
           sourceMap: true
         },
         expand: true,
