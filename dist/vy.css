@@ -1,0 +1,114 @@
+.vy video {
+  width: 100%;
+  display: block; }
+
+.vy {
+  position: relative;
+  overflow: hidden; }
+
+.vy:hover {
+  opacity: 0.9;
+  cursor: pointer; }
+
+.vy:active {
+  opacity: 0.8; }
+
+.vy .vy-positioner {
+  margin: -0.2em; }
+
+.vy .vy-controls {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0; }
+
+.vy .vy-controls:hover .vy-when-hovering {
+  display: block; }
+
+.vy .vy-controls .vy-play, .vy .vy-controls .vy-pause {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0; }
+
+.vy .vy-controls .vy-pause {
+  display: none; }
+
+.vy[playing]:hover {
+  opacity: 1; }
+
+.vy[playing] .vy-controls .vy-pause {
+  display: block; }
+
+.vy[playing] .vy-controls:hover .vy-when-playing {
+  display: block; }
+
+.vy .vy-controls .vy-when-playing,
+.vy .vy-controls .vy-when-hovering {
+  z-index: 3;
+  position: absolute;
+  bottom: 0;
+  display: none; }
+
+.vy .vy-controls .vy-when-playing {
+  left: 0.25em;
+  overflow: auto; }
+
+.vy .vy-controls .vy-when-hovering {
+  right: 0.25em;
+  overflow: auto; }
+
+.vy .vy-controls .vy-button {
+  margin: 0 0.25em;
+  display: inline-block;
+  height: 1.75em;
+  line-height: 1.75em;
+  background-size: 60%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.15);
+  font-family: 'Montserrat-Bold', Arial, sans-serif; }
+
+.vy .vy-controls .vy-when-playing .vy-button {
+  float: left; }
+
+.vy .vy-controls .vy-when-hovering .vy-button {
+  float: right; }
+
+.vy .vy-controls .vy-button:active {
+  opacity: 0.8; }
+
+.vy .vy-controls .vy-play-slider,
+.vy .vy-controls .vy-load-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  height: 0.3em; }
+
+.vy .vy-controls .vy-play-slider {
+  background: #E45B53;
+  z-index: 4; }
+
+.vy .vy-controls .vy-load-slider {
+  background: rgba(255, 255, 255, 0.3);
+  z-index: 3; }
+
+.vy[muted] .vy-controls .vy-button.vy-sound {
+  color: rgba(255, 255, 255, 0.5); }
+
+.vy .vy-controls .vy-button.vy-contract {
+  display: none; }
+
+.vy .vy-controls .vy-button.vy-expand {
+  display: block; }
+
+.vy .vy-controls .vy-button {
+  font-weight: 800;
+  font-size: 0.8em; }
+
+/*# sourceMappingURL=vy.css.map */

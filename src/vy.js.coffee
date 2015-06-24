@@ -177,3 +177,6 @@ $.fn.vy = (options = {}) ->
             $video.replaceWith vy.root
             video = vy.root[0]
         return video
+
+$ ->
+    $('.vy-video').vy();

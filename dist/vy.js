@@ -263,4 +263,8 @@ $.fn.vy = function(options) {
   });
 };
 
+$(function() {
+  return $('.vy-video').vy();
+});
+
 //# sourceMappingURL=vy.js.map
