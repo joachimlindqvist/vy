@@ -1,3 +1,11 @@
+@mixin gradient-vertical($start-color: rgba(0, 0, 0, 0), $end-color: rgba(0, 0, 0, 0.25), $start-percent: 0%, $end-percent: 100%) {
+  background-image: -webkit-linear-gradient(top, $start-color $start-percent, $end-color $end-percent);  // Safari 5.1-6, Chrome 10+
+  background-image: -o-linear-gradient(top, $start-color $start-percent, $end-color $end-percent);  // Opera 12
+  background-image: linear-gradient(to bottom, $start-color $start-percent, $end-color $end-percent); // Standard, IE10, Firefox 16+, Opera 12.10+, Safari 7+, Chrome 26+
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{ie-hex-str($start-color)}', endColorstr='#{ie-hex-str($end-color)}', GradientType=0); // IE9 and down
+}
+
 .vy video {
     width: 100%;
     display: block;
@@ -27,10 +35,21 @@
     bottom: 0;
     left: 0;
     right: 0;
+    @include gradient-vertical(rgba(0,0,0,0), rgba(0,0,0,0.25), 60%, 100%);
 }
 
-.vy .vy-controls:hover .vy-when-hovering {
-    display: block;
+.vy[playing] .vy-controls {
+    background: none;
+}
+
+.vy .vy-controls:hover {
+    @include gradient-vertical(rgba(0,0,0,0), rgba(0,0,0,0.25), 60%, 100%);
+}
+.vy[playing] .vy-controls .vy-buttons {
+    opacity: 0;
+}
+.vy[playing] .vy-controls:hover .vy-buttons {
+    opacity: 1;
 }
 
 .vy .vy-controls .vy-play, .vy .vy-controls .vy-pause {
@@ -53,30 +72,24 @@
     display: block;
 }
 
-.vy[playing] .vy-controls:hover .vy-when-playing {
-    display: block;
-}
-
-.vy .vy-controls .vy-when-playing,
-.vy .vy-controls .vy-when-hovering {
+.vy .vy-controls .vy-buttons {
+    transition: opacity .1s ease-in-out;
     z-index: 3;
     position: absolute;
-    bottom: 0;
-    display: none;
-}
-
-.vy .vy-controls .vy-when-playing{
-    left: 0.25em;
+    bottom: -3em;
     overflow: auto;
+
+    &.vy-buttons-left {
+        left: 0.75em;
+    }
+
+    &.vy-buttons-right {
+        right: 0.75em;
+    }
 }
 
-.vy .vy-controls .vy-when-hovering {
-    right: 0.25em;
-    overflow: auto;
-}
-
-.vy .vy-controls .vy-button {
-    margin: 0 0.25em;
+.vy .vy-controls .vy-buttons .vy-button {
+    margin: 0 0.5em 0.5em;
     display: inline-block;
     height: 1.75em;
     line-height: 1.75em;
@@ -85,15 +98,20 @@
     background-position: center center;
     text-transform: uppercase;
     color: #fff;
-    text-shadow: 1px 1px 0 rgba(0,0,0,0.15);
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.15);
     font-family: 'Montserrat-Regular', Arial, sans-serif;
+    border-bottom: 0.25em solid rgba(0,0,0,0);
 }
 
-.vy .vy-controls .vy-when-playing .vy-button {
+.vy .vy-controls .vy-buttons .vy-button:hover {
+    border-bottom-color: rgba(255,255,255,1);
+}
+
+.vy .vy-controls .vy-buttons-left .vy-button {
     float: left;
 }
 
-.vy .vy-controls .vy-when-hovering .vy-button {
+.vy .vy-controls .vy-buttons-right .vy-button {
     float: right;
 }
 
@@ -135,4 +153,21 @@
 .vy .vy-controls .vy-button {
     font-weight: 800;
     font-size: 0.8em;
+}
+
+.vy .vy-title {
+  position: absolute;
+  z-index: 5;
+  bottom: 1em;
+  font-family: 'Montserrat-Regular', Arial, sans-serif;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.15);
+  left: 1em;
+  right: 1em;
+  color: #fff;
+  font-weight: bold;
+  line-height: 1.15em;
+}
+
+.vy[playing] .vy-title {
+    //display: none;
 }

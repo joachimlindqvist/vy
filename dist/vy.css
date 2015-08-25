@@ -21,10 +21,28 @@
   top: 0;
   bottom: 0;
   left: 0;
-  right: 0; }
+  right: 0;
+  background-image: -webkit-linear-gradient(top, transparent 60%, rgba(0, 0, 0, 0.25) 100%);
+  background-image: -o-linear-gradient(top, transparent 60%, rgba(0, 0, 0, 0.25) 100%);
+  background-image: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.25) 100%);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#40000000', GradientType=0); }
 
-.vy .vy-controls:hover .vy-when-hovering {
-  display: block; }
+.vy[playing] .vy-controls {
+  background: none; }
+
+.vy .vy-controls:hover {
+  background-image: -webkit-linear-gradient(top, transparent 60%, rgba(0, 0, 0, 0.25) 100%);
+  background-image: -o-linear-gradient(top, transparent 60%, rgba(0, 0, 0, 0.25) 100%);
+  background-image: linear-gradient(to bottom, transparent 60%, rgba(0, 0, 0, 0.25) 100%);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00000000', endColorstr='#40000000', GradientType=0); }
+
+.vy[playing] .vy-controls .vy-buttons {
+  opacity: 0; }
+
+.vy[playing] .vy-controls:hover .vy-buttons {
+  opacity: 1; }
 
 .vy .vy-controls .vy-play, .vy .vy-controls .vy-pause {
   position: absolute;
@@ -42,26 +60,19 @@
 .vy[playing] .vy-controls .vy-pause {
   display: block; }
 
-.vy[playing] .vy-controls:hover .vy-when-playing {
-  display: block; }
-
-.vy .vy-controls .vy-when-playing,
-.vy .vy-controls .vy-when-hovering {
+.vy .vy-controls .vy-buttons {
+  transition: opacity .1s ease-in-out;
   z-index: 3;
   position: absolute;
-  bottom: 0;
-  display: none; }
-
-.vy .vy-controls .vy-when-playing {
-  left: 0.25em;
+  bottom: -3em;
   overflow: auto; }
+  .vy .vy-controls .vy-buttons.vy-buttons-left {
+    left: 0.75em; }
+  .vy .vy-controls .vy-buttons.vy-buttons-right {
+    right: 0.75em; }
 
-.vy .vy-controls .vy-when-hovering {
-  right: 0.25em;
-  overflow: auto; }
-
-.vy .vy-controls .vy-button {
-  margin: 0 0.25em;
+.vy .vy-controls .vy-buttons .vy-button {
+  margin: 0 0.5em 0.5em;
   display: inline-block;
   height: 1.75em;
   line-height: 1.75em;
@@ -71,12 +82,16 @@
   text-transform: uppercase;
   color: #fff;
   text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.15);
-  font-family: 'Montserrat-Regular', Arial, sans-serif; }
+  font-family: 'Montserrat-Regular', Arial, sans-serif;
+  border-bottom: 0.25em solid transparent; }
 
-.vy .vy-controls .vy-when-playing .vy-button {
+.vy .vy-controls .vy-buttons .vy-button:hover {
+  border-bottom-color: white; }
+
+.vy .vy-controls .vy-buttons-left .vy-button {
   float: left; }
 
-.vy .vy-controls .vy-when-hovering .vy-button {
+.vy .vy-controls .vy-buttons-right .vy-button {
   float: right; }
 
 .vy .vy-controls .vy-button:active {
@@ -110,5 +125,17 @@
 .vy .vy-controls .vy-button {
   font-weight: 800;
   font-size: 0.8em; }
+
+.vy .vy-title {
+  position: absolute;
+  z-index: 5;
+  bottom: 1em;
+  font-family: 'Montserrat-Regular', Arial, sans-serif;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.15);
+  left: 1em;
+  right: 1em;
+  color: #fff;
+  font-weight: bold;
+  line-height: 1.15em; }
 
 /*# sourceMappingURL=vy.css.map */

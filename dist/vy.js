@@ -1,8 +1,8 @@
 (function() {
   this.Vy = (function() {
-    var Events, buttonStructure, vyStructure;
+    var ControlsAnimationSpeed, Events, buttonStructure, vyStructure;
 
-    vyStructure = '<div class="vy"> <div class="vy-positioner"> <video class="vy-placeholder"></video> </div> <div class="vy-controls"> <div class="vy-play"></div> <div class="vy-pause"></div> <div class="vy-when-playing"></div> <div class="vy-when-hovering right-aligned"></div> <div class="vy-play-slider"></div> <div class="vy-load-slider"></div> </div> </div>';
+    vyStructure = '<div class="vy"> <div class="vy-title"></div> <div class="vy-positioner"> <video class="vy-placeholder"></video> </div> <div class="vy-controls"> <div class="vy-play"></div> <div class="vy-pause"></div> <div class="vy-buttons vy-buttons-left"></div> <div class="vy-buttons vy-buttons-right"></div> <div class="vy-play-slider"></div> <div class="vy-load-slider"></div> </div> </div>';
 
     buttonStructure = '<div class="vy-button"></div>';
 
@@ -11,6 +11,8 @@
       MovingSlider: false
     };
 
+    ControlsAnimationSpeed = 175;
+
     function Vy(original_video, options) {
       var settings;
       if (options == null) {
@@ -18,14 +20,15 @@
       }
       settings = {
         buttons: {
-          playing: ['rewind'],
-          hovering: ['sound']
+          left: ['rewind'],
+          right: ['sound']
         }
       };
       settings = $.extend(settings, options);
       this.root = this.buildPlayer(original_video, settings);
       this.root.data('vy', this);
       this.insertButtons(settings.buttons);
+      this.insertTitle(settings.title);
       this.root.on('mouseleave', (function(_this) {
         return function(e) {
           Events.MovingSlider = false;
@@ -92,12 +95,14 @@
       })(this));
       this.component('player').on('play', (function(_this) {
         return function(e) {
-          return _this.setAsPlaying();
+          _this.setAsPlaying();
+          return _this.enableControls();
         };
       })(this));
       this.component('player').on('pause', (function(_this) {
         return function(e) {
-          return _this.setAsPaused();
+          _this.setAsPaused();
+          return _this.enableTitle();
         };
       })(this));
       this.component('player').on('currenttimeupdate', (function(_this) {
@@ -128,8 +133,8 @@
       results = [];
       for (j = 0, len = ref.length; j < len; j++) {
         group = ref[j];
-        wrap = this.component("when-" + group);
-        if (wrap.hasClass('right-aligned')) {
+        wrap = this.component("buttons-" + group);
+        if (group === 'right') {
           buttons[group].reverse();
         }
         results.push((function() {
@@ -144,6 +149,12 @@
         })());
       }
       return results;
+    };
+
+    Vy.prototype.insertTitle = function(title) {
+      if (title != null ? title.length : void 0) {
+        return this.component("title").text(title);
+      }
     };
 
     Vy.prototype.component = function(name) {
@@ -209,14 +220,38 @@
 
     Vy.prototype.enablePauseButton = function() {
       this.component('play').hide();
-      this.component('pause').show();
-      return this.component('when-playing').show();
+      return this.component('pause').show();
     };
 
     Vy.prototype.enablePlayButton = function() {
       this.component('pause').hide();
-      this.component('play').show();
-      return this.component('when-playing').hide();
+      return this.component('play').show();
+    };
+
+    Vy.prototype.enableControls = function() {
+      var buttons, title;
+      title = this.component('title');
+      buttons = this.component('buttons');
+      return title.animate({
+        bottom: (-1 * title.height()) + "px"
+      }, ControlsAnimationSpeed, 'swing', function() {
+        return buttons.animate({
+          bottom: '0em'
+        }, ControlsAnimationSpeed);
+      });
+    };
+
+    Vy.prototype.enableTitle = function() {
+      var buttons, title;
+      title = this.component('title');
+      buttons = this.component('buttons');
+      return buttons.animate({
+        bottom: (-1 * buttons.height()) + "px"
+      }, ControlsAnimationSpeed, 'swing', function() {
+        return title.animate({
+          bottom: '1em'
+        }, ControlsAnimationSpeed);
+      });
     };
 
     Vy.prototype.setAsPlaying = function() {
@@ -265,7 +300,12 @@
   };
 
   $(function() {
-    return $('.vy-video').vy();
+    return $('.vy-video').each(function(i, video) {
+      var $video, options;
+      $video = $(video);
+      options = $video.data('vy-settings') || {};
+      return $video.vy(options);
+    });
   });
 
 }).call(this);

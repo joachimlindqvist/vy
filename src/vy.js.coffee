@@ -1,36 +1,40 @@
 class @Vy
 
-    vyStructure = 
+    vyStructure =
         '<div class="vy">
+            <div class="vy-title"></div>
             <div class="vy-positioner">
                 <video class="vy-placeholder"></video>
             </div>
             <div class="vy-controls">
                 <div class="vy-play"></div>
                 <div class="vy-pause"></div>
-                <div class="vy-when-playing"></div>
-                <div class="vy-when-hovering right-aligned"></div>
+                <div class="vy-buttons vy-buttons-left"></div>
+                <div class="vy-buttons vy-buttons-right"></div>
                 <div class="vy-play-slider"></div>
                 <div class="vy-load-slider"></div>
             </div>
         </div>'
     buttonStructure = '<div class="vy-button"></div>'
 
-    Events = 
+    Events =
         MouseDownOnVideo: false,
         MovingSlider: false
 
+    ControlsAnimationSpeed = 175
+
     constructor: (original_video, options = {}) ->
 
-        settings = 
+        settings =
             buttons:
-                playing: ['rewind'],
-                hovering: ['sound']
+                left: ['rewind'],
+                right: ['sound']
         settings = $.extend settings, options
 
         @root = @buildPlayer original_video, settings
         @root.data('vy', this);
         @insertButtons settings.buttons
+        @insertTitle settings.title
 
         @root.on 'mouseleave', (e) =>
             Events.MovingSlider = false
@@ -43,10 +47,10 @@ class @Vy
         @component('pause').on 'click', (e) =>
             e.preventDefault()
 
-            if Events.MovingSlider 
+            if Events.MovingSlider
                 @seekToPercent(@getSeekPercent(e.clientX))
                 @play()
-            else 
+            else
                 @pause()
 
             Events.MovingSlider = false;
@@ -65,7 +69,7 @@ class @Vy
                 @seekToPercent(percent);
                 @movePlaySliderToPercent(percent);
 
-        @component('player').on 'progress', (e) => 
+        @component('player').on 'progress', (e) =>
             currentPercent = this.buffered?.end(0);
             if currentPercent isnt this.duration
                 self.moveLoadSliderToPercent(currentPercent)
@@ -80,14 +84,16 @@ class @Vy
 
         @component('player').on 'play', (e) =>
             @setAsPlaying()
+            @enableControls()
 
         @component('player').on 'pause', (e) =>
             @setAsPaused()
+            @enableTitle()
 
         @component('player').on 'currenttimeupdate', (e) =>
             @movePlaySliderToPercent(@getCurrentTimePercent())
 
-        setInterval => 
+        setInterval =>
             @component('player').trigger('currenttimeupdate') if @isPlaying()
         , 20
 
@@ -102,16 +108,19 @@ class @Vy
 
         for group in Object.keys buttons
 
-            wrap = @component "when-#{group}"
-            buttons[group].reverse() if wrap.hasClass 'right-aligned'
+            wrap = @component "buttons-#{group}"
+            buttons[group].reverse() if group == 'right'
 
             for button in buttons[group]
                 wrap.append $button.clone().addClass("vy-#{button}").text(button)
 
-    component: (name) -> 
+    insertTitle: (title) ->
+        @component("title").text(title) if title?.length
+
+    component: (name) ->
         @root.find ".vy-#{name}"
 
-    getCurrentTimePercent: -> 
+    getCurrentTimePercent: ->
         player = @component('player').get(0)
         player.currentTime / player.duration
 
@@ -123,11 +132,11 @@ class @Vy
         percent = 1 if percent >= 1
         @component('load-slider').css 'right', "#{100 - (percent * 100)}%"
 
-    seekToPercent: (percent) -> 
+    seekToPercent: (percent) ->
         player = @component('player').get(0)
         @seekToDuration(percent * player.duration)
 
-    seekToDuration: (duration) -> 
+    seekToDuration: (duration) ->
         player = @component('player').get(0)
         player.currentTime = duration
 
@@ -151,12 +160,30 @@ class @Vy
     enablePauseButton: ->
         @component('play').hide()
         @component('pause').show()
-        @component('when-playing').show()
 
     enablePlayButton: ->
         @component('pause').hide()
         @component('play').show()
-        @component('when-playing').hide()
+
+    enableControls: ->
+        title = @component('title')
+        buttons = @component('buttons')
+        title.animate(
+            bottom: "#{(-1 * title.height())}px",
+            ControlsAnimationSpeed,
+            'swing',
+            -> buttons.animate(bottom: '0em', ControlsAnimationSpeed)
+        )
+
+    enableTitle: ->
+        title = @component('title')
+        buttons = @component('buttons')
+        buttons.animate(
+            bottom: "#{(-1 * buttons.height())}px",
+            ControlsAnimationSpeed,
+            'swing',
+            -> title.animate(bottom: '1em', ControlsAnimationSpeed)
+        )
 
     setAsPlaying: -> @root.attr 'playing', 'playing'
 
@@ -179,4 +206,7 @@ $.fn.vy = (options = {}) ->
         return video
 
 $ ->
-    $('.vy-video').vy();
+    $('.vy-video').each (i, video) ->
+        $video = $(video)
+        options = $video.data('vy-settings') || {}
+        $video.vy options
