@@ -256,8 +256,8 @@
     };
 
     Vy.prototype.unmute = function() {
-      this.component('player', false).setAttribute('muted', null);
-      return this.root.setAttribute('muted', null);
+      this.component('player', false).removeAttribute('muted');
+      return this.root.removeAttribute('muted');
     };
 
     Vy.prototype.enablePauseButton = function() {

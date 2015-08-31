@@ -187,8 +187,8 @@ class @Vy
         @root.setAttribute 'muted', 'muted'
 
     unmute: ->
-        @component('player', false).setAttribute 'muted', null
-        @root.setAttribute 'muted', null
+        @component('player', false).removeAttribute 'muted'
+        @root.removeAttribute 'muted'
 
     enablePauseButton: ->
         hide @component('play', false)
@@ -214,8 +214,7 @@ class @Vy
 
     isPlaying: -> @root?.getAttribute('playing') is 'playing'
 
-    toggleMute: ->
-        if @isMuted() then @unmute() else @mute()
+    toggleMute: -> if @isMuted() then @unmute() else @mute()
 
 
 window.addEventListener 'load', (e) ->
