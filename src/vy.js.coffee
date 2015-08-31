@@ -10,7 +10,7 @@ createElementFromString = (string) ->
 
 offset = (elem) ->
     alert 'implement offset()'
-
+ 
 class @Vy
 
     vyStructure =
