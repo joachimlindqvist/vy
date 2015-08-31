@@ -1,4 +1,34 @@
 (function() {
+  var animate, createElementFromString, extend, offset,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  extend = function(orig, items) {
+    var item, key;
+    for (key in items) {
+      item = items[key];
+      orig[key] = item;
+    }
+    return orig;
+  };
+
+  createElementFromString = function(string) {
+    var temp;
+    temp = document.createElement('div');
+    temp.innerHTML = string;
+    return temp.childNodes[0];
+  };
+
+  offset = function(elem) {
+    return alert('implement offset()');
+  };
+
+  animate = function(elem, speed, props, callback) {
+    alert('implement animate()');
+    if (callback != null) {
+      return callback.call();
+    }
+  };
+
   this.Vy = (function() {
     var ControlsAnimationSpeed, Events, buttonStructure, vyStructure;
 
@@ -18,30 +48,31 @@
       if (options == null) {
         options = {};
       }
+      this.hook = bind(this.hook, this);
       settings = {
         buttons: {
           left: ['rewind'],
           right: ['sound']
         }
       };
-      settings = $.extend(settings, options);
+      settings = extend(settings, options);
       this.root = this.buildPlayer(original_video, settings);
-      this.root.data('vy', this);
+      this.hook(this.root);
       this.insertButtons(settings.buttons);
       this.insertTitle(settings.title);
-      this.root.on('mouseleave', (function(_this) {
+      this.root.addEventListener('mouseleave', (function(_this) {
         return function(e) {
           Events.MovingSlider = false;
           return Events.MouseDownOnVideo = false;
         };
       })(this));
-      this.component('play').on('click', (function(_this) {
+      this.component('play', false).addEventListener('click', (function(_this) {
         return function(e) {
           e.preventDefault();
           return _this.play();
         };
       })(this));
-      this.component('pause').on('click', (function(_this) {
+      this.component('pause', false).addEventListener('click', (function(_this) {
         return function(e) {
           e.preventDefault();
           if (Events.MovingSlider) {
@@ -54,13 +85,13 @@
           return Events.MouseDownOnVideo = false;
         };
       })(this));
-      this.component('pause').on('mousedown', (function(_this) {
+      this.component('pause', false).addEventListener('mousedown', (function(_this) {
         return function(e) {
           e.preventDefault();
           return Events.MouseDownOnVideo = true;
         };
       })(this));
-      this.component('pause').on('mousemove', (function(_this) {
+      this.component('pause', false).addEventListener('mousemove', (function(_this) {
         return function(e) {
           var percent;
           e.preventDefault();
@@ -72,7 +103,7 @@
           }
         };
       })(this));
-      this.component('player').on('progress', (function(_this) {
+      this.component('player', false).addEventListener('progress', (function(_this) {
         return function(e) {
           var currentPercent, ref;
           currentPercent = (ref = _this.buffered) != null ? ref.end(0) : void 0;
@@ -81,31 +112,31 @@
           }
         };
       })(this));
-      this.component('rewind').on('click', (function(_this) {
+      this.component('rewind', false).addEventListener('click', (function(_this) {
         return function(e) {
           e.stopPropagation();
           return _this.seekToDuration(0);
         };
       })(this));
-      this.component('sound').on('click', (function(_this) {
+      this.component('sound', false).addEventListener('click', (function(_this) {
         return function(e) {
           e.stopPropagation();
           return _this.toggleMute();
         };
       })(this));
-      this.component('player').on('play', (function(_this) {
+      this.component('player', false).addEventListener('play', (function(_this) {
         return function(e) {
           _this.setAsPlaying();
           return _this.enableControls();
         };
       })(this));
-      this.component('player').on('pause', (function(_this) {
+      this.component('player', false).addEventListener('pause', (function(_this) {
         return function(e) {
           _this.setAsPaused();
           return _this.enableTitle();
         };
       })(this));
-      this.component('player').on('currenttimeupdate', (function(_this) {
+      this.component('player', false).addEventListener('currenttimeupdate', (function(_this) {
         return function(e) {
           return _this.movePlaySliderToPercent(_this.getCurrentTimePercent());
         };
@@ -119,21 +150,29 @@
       })(this), 20);
     }
 
+    Vy.prototype.hook = function(el) {
+      return el.vy = this;
+    };
+
     Vy.prototype.buildPlayer = function(original_video, settings) {
-      var player, root;
-      player = $(original_video).clone().addClass('vy-player');
-      root = $(vyStructure).find('video.vy-placeholder').replaceWith(player).end();
-      return root;
+      var placeholder, player, vy;
+      player = original_video.cloneNode(true);
+      player.classList.add('vy-player');
+      vy = createElementFromString(vyStructure, true);
+      placeholder = vy.querySelector('video.vy-placeholder');
+      placeholder.parentNode.replaceChild(player, placeholder);
+      original_video.parentNode.replaceChild(vy, original_video);
+      return vy;
     };
 
     Vy.prototype.insertButtons = function(buttons) {
-      var $button, button, group, j, len, ref, results, wrap;
-      $button = $(buttonStructure);
+      var button, buttonElement, buttonScaffold, group, j, len, ref, results, wrap;
+      buttonScaffold = createElementFromString(buttonStructure);
       ref = Object.keys(buttons);
       results = [];
       for (j = 0, len = ref.length; j < len; j++) {
         group = ref[j];
-        wrap = this.component("buttons-" + group);
+        wrap = this.component("buttons-" + group, false);
         if (group === 'right') {
           buttons[group].reverse();
         }
@@ -143,7 +182,10 @@
           results1 = [];
           for (k = 0, len1 = ref1.length; k < len1; k++) {
             button = ref1[k];
-            results1.push(wrap.append($button.clone().addClass("vy-" + button).text(button)));
+            buttonElement = buttonScaffold.cloneNode(true);
+            buttonElement.classList.add("vy-" + button);
+            buttonElement.textContent = button;
+            results1.push(wrap.appendChild(buttonElement));
           }
           return results1;
         })());
@@ -153,17 +195,24 @@
 
     Vy.prototype.insertTitle = function(title) {
       if (title != null ? title.length : void 0) {
-        return this.component("title").text(title);
+        return this.component("title", false).textContent = title;
       }
     };
 
-    Vy.prototype.component = function(name) {
-      return this.root.find(".vy-" + name);
+    Vy.prototype.component = function(name, o) {
+      if (o == null) {
+        o = true;
+      }
+      if (o) {
+        return $(this.root).find(".vy-" + name);
+      } else {
+        return this.root.querySelector(".vy-" + name);
+      }
     };
 
     Vy.prototype.getCurrentTimePercent = function() {
       var player;
-      player = this.component('player').get(0);
+      player = this.component('player');
       return player.currentTime / player.duration;
     };
 
@@ -171,104 +220,101 @@
       if (percent >= 1) {
         percent = 1;
       }
-      return this.component('play-slider').css('right', (100 - (percent * 100)) + "%");
+      return this.component('play-slider').style.right = (100 - (percent * 100)) + "%";
     };
 
     Vy.prototype.moveLoadSliderToPercent = function(percent) {
       if (percent >= 1) {
         percent = 1;
       }
-      return this.component('load-slider').css('right', (100 - (percent * 100)) + "%");
+      return this.component('load-slider').style.right = (100 - (percent * 100)) + "%";
     };
 
     Vy.prototype.seekToPercent = function(percent) {
       var player;
-      player = this.component('player').get(0);
+      player = this.component('player', false);
       return this.seekToDuration(percent * player.duration);
     };
 
     Vy.prototype.seekToDuration = function(duration) {
-      var player;
-      player = this.component('player').get(0);
-      return player.currentTime = duration;
+      return this.component('player', false).currentTime = duration;
     };
 
     Vy.prototype.getSeekPercent = function(mouseLeft) {
-      var player, pos;
-      player = this.component('player');
-      pos = player.offset();
-      return (mouseLeft - pos.left) / player.width();
+      var player;
+      player = this.component('player', false);
+      return (mouseLeft - offset(player).left) / player.width();
     };
 
     Vy.prototype.play = function() {
-      return this.component('player').get(0).play();
+      return this.component('player', false).play();
     };
 
     Vy.prototype.pause = function() {
-      return this.component('player').get(0).pause();
+      return this.component('player', false).pause();
     };
 
     Vy.prototype.mute = function() {
-      this.component('player').attr('muted', 'muted');
-      return this.root.attr('muted', 'muted');
+      this.component('player', false).setAttribute('muted', 'muted');
+      return this.root.setAttribute('muted', 'muted');
     };
 
     Vy.prototype.unmute = function() {
-      this.component('player').attr('muted', null);
-      return this.root.attr('muted', null);
+      this.component('player', false).setAttribute('muted', null);
+      return this.root.setAttribute('muted', null);
     };
 
     Vy.prototype.enablePauseButton = function() {
-      this.component('play').hide();
-      return this.component('pause').show();
+      hide(this.component('play', false));
+      return show(this.component('pause', false));
     };
 
     Vy.prototype.enablePlayButton = function() {
-      this.component('pause').hide();
-      return this.component('play').show();
+      hide(this.component('pause', false));
+      return show(this.component('play', false));
     };
 
     Vy.prototype.enableControls = function() {
       var buttons, title;
-      title = this.component('title');
-      buttons = this.component('buttons');
-      return title.animate({
-        bottom: (-1 * title.height()) + "px"
-      }, ControlsAnimationSpeed, 'swing', function() {
-        return buttons.animate({
+      title = this.component('title', false);
+      buttons = this.component('buttons', false);
+      return animate(title, ControlsAnimationSpeed, {
+        bottom: (-1 * title.style.height) + "px"
+      }, function() {
+        return animate(buttons, ControlsAnimationSpeed, {
           bottom: '0em'
-        }, ControlsAnimationSpeed);
+        });
       });
     };
 
     Vy.prototype.enableTitle = function() {
       var buttons, title;
-      title = this.component('title');
-      buttons = this.component('buttons');
-      return buttons.animate({
-        bottom: (-1 * buttons.height()) + "px"
-      }, ControlsAnimationSpeed, 'swing', function() {
-        return title.animate({
+      title = this.component('title', false);
+      buttons = this.component('buttons', false);
+      return animate(buttons, ControlsAnimationSpeed, {
+        bottom: (-1 * buttons.style.height) + "px"
+      }, function() {
+        return animate(title, ControlsAnimationSpeed, {
           bottom: '1em'
-        }, ControlsAnimationSpeed);
+        });
       });
     };
 
     Vy.prototype.setAsPlaying = function() {
-      return this.root.attr('playing', 'playing');
+      return this.root.setAttribute('playing', 'playing');
     };
 
     Vy.prototype.setAsPaused = function() {
-      return this.root.attr('playing', null);
+      return this.root.setAttribute('playing', null);
     };
 
     Vy.prototype.isMuted = function() {
-      return !!this.component('player').attr('muted');
+      return !!this.component('player', false).getAttribute('muted');
     };
 
     Vy.prototype.isPlaying = function() {
       var ref;
-      return ((ref = this.root[0]) != null ? ref.getAttribute('playing') : void 0) === 'playing';
+      return ((ref = this.root) != null ? ref.getAttribute('playing') : void 0) === 'playing';
     };
 
     Vy.prototype.toggleMute = function() {
@@ -283,21 +329,21 @@
 
   })();
 
-  $.fn.vy = function(options) {
-    if (options == null) {
-      options = {};
-    }
-    return this.each(function(i, video) {
-      var $video, vy;
-      $video = $(video);
-      if ($video.data('vy') == null) {
-        vy = new Vy($(video)[0], options);
-        $video.replaceWith(vy.root);
-        video = vy.root[0];
+  if (typeof $ !== "undefined" && $ !== null) {
+    $.fn.vy = function(options) {
+      if (options == null) {
+        options = {};
       }
-      return video;
-    });
-  };
+      return this.each(function(i, video) {
+        var vy;
+        if (video.vy == null) {
+          vy = new Vy(video, options);
+          video.vy = vy;
+        }
+        return video;
+      });
+    };
+  }
 
   $(function() {
     return $('.vy-video').each(function(i, video) {
