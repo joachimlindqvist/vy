@@ -172,6 +172,54 @@
   line-height: 1.15em;
 }
 
-.vy[playing] .vy-title {
-    //display: none;
+.vy {
+
+    .vy-title {
+        transition: bottom .2s;
+        transition-delay: .2s;
+        bottom: 1em;
+    }
+
+    .vy-controls .vy-buttons {
+        transition: bottom .2s;
+        bottom: -40px;
+    }
+
 }
+
+.vy[playing="playing"] {
+
+    .vy-title {
+        transition: bottom .2s;
+        bottom: -40px;
+    }
+
+    .vy-controls .vy-buttons {
+        transition: bottom .2s;
+        transition-delay: .2s;
+        bottom: 0em;
+    }
+}
+
+
+// animate(
+//     title,
+//     ControlsAnimationSpeed,
+//     bottom: "#{(-1 * title.style.height)}px",
+//     -> animate(
+//         title,
+//         ControlsAnimationSpeed,
+//         bottom: '0em'
+//     )
+// )
+//
+// animate(
+//     buttons,
+//     ControlsAnimationSpeed,
+//     bottom: "#{(-1 * buttons.style.height)}px",
+//     -> animate(
+//         title,
+//         ControlsAnimationSpeed,
+//         bottom: '1em'
+//     )
+// )

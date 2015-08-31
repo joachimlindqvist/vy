@@ -11,12 +11,6 @@ createElementFromString = (string) ->
 offset = (elem) ->
     alert 'implement offset()'
 
-animate = (elem, speed, props, callback) ->
-    alert 'implement animate()'
-
-    if callback?
-        callback.call()
-
 class @Vy
 
     vyStructure =
@@ -51,10 +45,10 @@ class @Vy
         settings = extend settings, options
 
         @root = @buildPlayer original_video, settings
-        @hook @root
-
         @insertButtons settings.buttons
         @insertTitle settings.title
+
+        @hook @root
 
         @root.addEventListener 'mouseleave', (e) =>
             Events.MovingSlider = false
@@ -114,7 +108,9 @@ class @Vy
             @movePlaySliderToPercent(@getCurrentTimePercent())
 
         setInterval =>
-            @component('player').trigger('currenttimeupdate') if @isPlaying()
+            if @isPlaying()
+                currenttimeupdate = new Event('currenttimeupdate');
+                @component('player', false).dispatchEvent(currenttimeupdate)
         , 20
 
     hook: (el) =>
@@ -158,16 +154,18 @@ class @Vy
             @root.querySelector ".vy-#{name}"
 
     getCurrentTimePercent: ->
-        player = @component('player')
+        player = @component('player', false)
         player.currentTime / player.duration
 
     movePlaySliderToPercent: (percent) ->
-        percent = 1 if percent >= 1
-        @component('play-slider').style.right = "#{100 - (percent * 100)}%"
+        @moveSliderToPercent @component('play-slider', false), percent
 
     moveLoadSliderToPercent: (percent) ->
+        @moveSliderToPercent @component('load-slider', false), percent
+
+    moveSliderToPercent: (slider, percent) ->
         percent = 1 if percent >= 1
-        @component('load-slider').style.right = "#{100 - (percent * 100)}%"
+        slider.style.right = "#{100 - (percent * 100)}%"
 
     seekToPercent: (percent) ->
         player = @component('player', false)
@@ -203,34 +201,14 @@ class @Vy
     enableControls: ->
         title = @component('title', false)
         buttons = @component('buttons', false)
-        animate(
-            title,
-            ControlsAnimationSpeed,
-            bottom: "#{(-1 * title.style.height)}px",
-            -> animate(
-                buttons,
-                ControlsAnimationSpeed,
-                bottom: '0em'
-            )
-        )
 
     enableTitle: ->
         title = @component('title', false)
         buttons = @component('buttons', false)
-        animate(
-            buttons,
-            ControlsAnimationSpeed,
-            bottom: "#{(-1 * buttons.style.height)}px",
-            -> animate(
-                title,
-                ControlsAnimationSpeed,
-                bottom: '1em'
-            )
-        )
 
     setAsPlaying: -> @root.setAttribute 'playing', 'playing'
 
-    setAsPaused: -> @root.setAttribute 'playing', null
+    setAsPaused: -> @root.removeAttribute 'playing'
 
     isMuted: -> !!@component('player', false).getAttribute('muted')
 
@@ -239,17 +217,15 @@ class @Vy
     toggleMute: ->
         if @isMuted() then @unmute() else @mute()
 
+
+window.addEventListener 'load', (e) ->
+    for video in document.querySelectorAll '.vy-video'
+        settings = JSON.parse video.getAttribute('data-vy-settings')
+        video.vy = new Vy(video, settings)
+
 if $?
     $.fn.vy = (options = {}) ->
         @each (i, video) ->
             unless video.vy?
-                vy = new Vy(video, options)
-                video.vy = vy
+                video.vy = new Vy(video, options)
             return video
-
-
-$ ->
-    $('.vy-video').each (i, video) ->
-        $video = $(video)
-        options = $video.data('vy-settings') || {}
-        $video.vy options

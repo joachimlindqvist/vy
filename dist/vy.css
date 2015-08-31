@@ -142,4 +142,20 @@
   font-weight: bold;
   line-height: 1.15em; }
 
+.vy .vy-title {
+  transition: bottom .2s;
+  transition-delay: .2s;
+  bottom: 1em; }
+.vy .vy-controls .vy-buttons {
+  transition: bottom .2s;
+  bottom: -40px; }
+
+.vy[playing="playing"] .vy-title {
+  transition: bottom .2s;
+  bottom: -40px; }
+.vy[playing="playing"] .vy-controls .vy-buttons {
+  transition: bottom .2s;
+  transition-delay: .2s;
+  bottom: 0em; }
+
 /*# sourceMappingURL=vy.css.map */
