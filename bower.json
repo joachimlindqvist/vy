@@ -19,6 +19,7 @@
   ],
   "dependencies": {
     "jquery": "^2.1.4",
-    "montserrat": "~1.0.0"
+    "montserrat": "~1.0.0",
+    "requirejs": "*"
   }
 }

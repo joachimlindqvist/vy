@@ -5,18 +5,14 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('bower.json'),
 
     coffee: {
-      coffee_to_js: {
-        options: {
-          bare: false,
-          sourceMap: true
-        },
-        expand: true,
-        flatten: true,
-        cwd: "src",
-        src: ["**/*.js.coffee"],
-        dest: 'dist',
-        ext: ".js"
-      }
+        coffee_to_js: {
+            options: {
+                join: true
+            },
+            files: {
+                "dist/vy.js": ["src/**/*.coffee"]
+            }
+        }
     },
 
     uglify: {
