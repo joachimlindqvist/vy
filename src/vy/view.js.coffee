@@ -1,29 +1,60 @@
 class View
 
     vyStructure =
-        '<div class="vy">
-            <div class="vy-title"></div>
-            <div class="vy-positioner">
-                <video class="vy-placeholder"></video>
+        "<div class='vy'>
+            <div class='vy-title'></div>
+            <div class='vy-positioner'>
+                <video class='vy-placeholder'></video>
             </div>
-            <div class="vy-controls">
-                <div class="vy-play"></div>
-                <div class="vy-pause"></div>
-                <div class="vy-buttons vy-buttons-left"></div>
-                <div class="vy-buttons vy-buttons-right"></div>
-                <div class="vy-play-slider"></div>
-                <div class="vy-load-slider"></div>
+            <div class='vy-controls'>
+                <div class='vy-play'></div>
+                <div class='vy-pause'></div>
+                <div class='vy-buttons vy-buttons-left'></div>
+                <div class='vy-buttons vy-buttons-right'></div
+                <div class='vy-play-slider'></div>
+                <div class='vy-load-slider'></div>
             </div>
-        </div>'
+        </div>"
     buttonStructure = '<div class="vy-button"></div>'
 
     constructor: (original_video, settings) ->
 
         @componentCache = {}
+        console.log(@buildComponentTree())
+        return
 
         @root = @buildPlayer(original_video, settings)
         @insertButtons(settings.buttons)
         @insertTitle(settings.title)
+
+    buildComponentTree: ->
+
+        [
+            ['title', new Title(), [
+                ['positioner', new Positioner()],
+            ]],
+
+            ['placeholder', new Placeholder()],
+            ['controls', new Controls()],
+            ['play', new Play()],
+            ['pause', new Pause()],
+            ['buttonsLeft', new Buttons('left')],
+            ['buttonsRight', new Buttons('right')],
+            ['playSlider', new Slider('play')],
+            ['loadSlider', new Slider('load')]
+        ]
+
+        [
+            {
+                title: new Title,
+                children: {
+                    positioner: new Positioner(),
+                    children: {
+                        placeholder: new Placeholder()
+                    }
+                }
+            }
+        ]
 
     buildPlayer: (original_video, settings) ->
 

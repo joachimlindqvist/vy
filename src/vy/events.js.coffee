@@ -9,6 +9,9 @@ class Events
         @Vy = Vy
         @init()
 
+    trigger: (eventName) ->
+        @View.component('player').dispatchEvent(new Event(eventName))
+
     init: ->
 
         @View.component('root').addEventListener('mouseleave', (e) =>
@@ -25,7 +28,7 @@ class Events
             e.preventDefault()
 
             if Events.MovingSlider
-                @Vy.seekToPercent(@Vy.getSeekPercent(e.clientX))
+                @Vy.jumpToPercent(@Vy.getSeekPercent(e.clientX))
                 @Vy.play()
             else
                 @Vy.pause()
@@ -45,7 +48,7 @@ class Events
             if ActiveEvents.MouseDownOnVideo
                 ActiveEvents.MovingSlider = true;
                 percent = @Vy.getSeekPercent(e.clientX)
-                @Vy.seekToPercent(percent);
+                @Vy.jumpToPercent(percent);
                 @Vy.movePlaySliderToPercent(percent);
         )
 
@@ -57,7 +60,7 @@ class Events
 
         @View.component('rewind').addEventListener('click', (e) =>
             e.stopPropagation()
-            @Vy.seekToDuration(0)
+            @Vy.rewind()
         )
 
         @View.component('sound').addEventListener('click', (e) =>
@@ -74,10 +77,10 @@ class Events
         )
 
         @View.component('player').addEventListener('currenttimeupdate', (e) =>
-            @Vy.movePlaySliderToPercent(@Vy.getCurrentTimePercent())
+            @Vy.movePlaySliderToPercent(@Vy.elapsedPercent())
         )
-        
+
         setInterval( =>
-                if @Vy.isPlaying() then @Vy.trigger 'currenttimeupdate'
+                if @Vy.isPlaying() then @trigger 'currenttimeupdate'
             , 20
         )

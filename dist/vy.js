@@ -1,6 +1,8 @@
 (function() {
-  var Events, View, createElementFromString, extend, offset,
-    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var Buttons, Component, Controls, Events, Pause, Placeholder, Play, Positioner, Slider, Title, View, createElementFromString, extend, offset,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    extend1 = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = {}.hasOwnProperty;
 
   extend = function(orig, items) {
     var item, key;
@@ -19,7 +21,12 @@
   };
 
   offset = function(elem) {
-    return alert('implement offset()');
+    var clientRect;
+    clientRect = elem.getBoundingClientRect();
+    return {
+      top: clientRect.top + window.pageYOffset,
+      left: clientRect.left + window.pageXOffset
+    };
   };
 
   this.Vy = (function() {
@@ -45,41 +52,32 @@
       return el.vy = this;
     };
 
-    Vy.prototype.getCurrentTimePercent = function() {
+    Vy.prototype.elapsedPercent = function() {
+      return this.elapsedSeconds() / player.duration;
+    };
+
+    Vy.prototype.elapsedSeconds = function() {
+      return this.View.component('player').currentTime;
+    };
+
+    Vy.prototype.jumpToPercent = function(percent) {
       var player;
       player = this.View.component('player');
-      return player.currentTime / player.duration;
+      return this.jumpToSecond(percent * player.duration);
     };
 
-    Vy.prototype.movePlaySliderToPercent = function(percent) {
-      return this.moveSliderToPercent(this.View.component('play-slider'), percent);
-    };
-
-    Vy.prototype.moveLoadSliderToPercent = function(percent) {
-      return this.moveSliderToPercent(this.View.component('load-slider'), percent);
-    };
-
-    Vy.prototype.moveSliderToPercent = function(slider, percent) {
-      if (percent >= 1) {
-        percent = 1;
-      }
-      return slider.style.right = (100 - (percent * 100)) + "%";
-    };
-
-    Vy.prototype.seekToPercent = function(percent) {
-      var player;
-      player = this.View.component('player');
-      return this.seekToDuration(percent * player.duration);
-    };
-
-    Vy.prototype.seekToDuration = function(duration) {
+    Vy.prototype.jumpToSecond = function(duration) {
       return this.View.component('player').currentTime = duration;
+    };
+
+    Vy.prototype.rewind = function() {
+      return this.jumpToSecond(0);
     };
 
     Vy.prototype.getSeekPercent = function(mouseLeft) {
       var player;
       player = this.View.component('player');
-      return (mouseLeft - offset(player).left) / player.width();
+      return (mouseLeft - offset(player).left) / player.offsetWidth;
     };
 
     Vy.prototype.play = function() {
@@ -98,16 +96,6 @@
     Vy.prototype.unmute = function() {
       this.View.component('player').removeAttribute('muted');
       return this.root.removeAttribute('muted');
-    };
-
-    Vy.prototype.enablePauseButton = function() {
-      hide(this.View.component('play'));
-      return show(this.View.component('pause'));
-    };
-
-    Vy.prototype.enablePlayButton = function() {
-      hide(this.View.component('pause'));
-      return show(this.View.component('play'));
     };
 
     Vy.prototype.setAsPlaying = function() {
@@ -133,10 +121,6 @@
       } else {
         return this.mute();
       }
-    };
-
-    Vy.prototype.trigger = function(eventName) {
-      return this.View.component('player').dispatchEvent(new Event(eventName));
     };
 
     return Vy;
@@ -169,6 +153,151 @@
     };
   }
 
+  Component = (function() {
+    function Component(name) {
+      this.root = this.build(name);
+    }
+
+    Component.prototype.toString = function() {
+      return this.root.toString();
+    };
+
+    return Component;
+
+  })();
+
+  Buttons = (function(superClass) {
+    extend1(Buttons, superClass);
+
+    function Buttons() {
+      return Buttons.__super__.constructor.apply(this, arguments);
+    }
+
+    Buttons.prototype.build = function(name) {
+      return "<div class='vy-buttons vy-buttons-" + name + "'></div>";
+    };
+
+    return Buttons;
+
+  })(Component);
+
+  Controls = (function(superClass) {
+    extend1(Controls, superClass);
+
+    function Controls() {
+      return Controls.__super__.constructor.apply(this, arguments);
+    }
+
+    Controls.prototype.build = function() {
+      return "<div class='vy-controls'></div>";
+    };
+
+    return Controls;
+
+  })(Component);
+
+  Pause = (function(superClass) {
+    extend1(Pause, superClass);
+
+    function Pause() {
+      return Pause.__super__.constructor.apply(this, arguments);
+    }
+
+    Pause.prototype.build = function() {
+      return "<div class='vy-pause'></div>";
+    };
+
+    return Pause;
+
+  })(Component);
+
+  Placeholder = (function(superClass) {
+    extend1(Placeholder, superClass);
+
+    function Placeholder() {
+      return Placeholder.__super__.constructor.apply(this, arguments);
+    }
+
+    Placeholder.prototype.build = function() {
+      return "<div class='vy-placeholder'></div>";
+    };
+
+    return Placeholder;
+
+  })(Component);
+
+  Play = (function(superClass) {
+    extend1(Play, superClass);
+
+    function Play() {
+      return Play.__super__.constructor.apply(this, arguments);
+    }
+
+    Play.prototype.build = function() {
+      return "<div class='vy-play'></div>";
+    };
+
+    return Play;
+
+  })(Component);
+
+  Positioner = (function(superClass) {
+    extend1(Positioner, superClass);
+
+    function Positioner() {
+      return Positioner.__super__.constructor.apply(this, arguments);
+    }
+
+    Positioner.prototype.build = function() {
+      return "<div class='vy-positioner'></div>";
+    };
+
+    return Positioner;
+
+  })(Component);
+
+  Slider = (function(superClass) {
+    extend1(Slider, superClass);
+
+    function Slider() {
+      return Slider.__super__.constructor.apply(this, arguments);
+    }
+
+    Slider.prototype.build = function(name) {
+      return "<div class='vy-" + name + "-slider'></div>";
+    };
+
+    Slider.prototype.moveToPercent = function(percent) {
+      if (percent >= 1) {
+        percent = 1;
+      }
+      return this.root.style.right = (100 - (percent * 100)) + "%";
+    };
+
+    return Slider;
+
+  })(Component);
+
+  Title = (function(superClass) {
+    extend1(Title, superClass);
+
+    function Title() {
+      return Title.__super__.constructor.apply(this, arguments);
+    }
+
+    Title.prototype.build = function() {
+      return "<div class='vy-title'></div>";
+    };
+
+    Title.prototype.set = function(title) {
+      this.title = title;
+      return this.root.textContent = title;
+    };
+
+    return Title;
+
+  })(Component);
+
   Events = (function() {
     var ActiveEvents;
 
@@ -182,6 +311,10 @@
       this.Vy = Vy;
       this.init();
     }
+
+    Events.prototype.trigger = function(eventName) {
+      return this.View.component('player').dispatchEvent(new Event(eventName));
+    };
 
     Events.prototype.init = function() {
       this.View.component('root').addEventListener('mouseleave', (function(_this) {
@@ -200,7 +333,7 @@
         return function(e) {
           e.preventDefault();
           if (Events.MovingSlider) {
-            _this.Vy.seekToPercent(_this.Vy.getSeekPercent(e.clientX));
+            _this.Vy.jumpToPercent(_this.Vy.getSeekPercent(e.clientX));
             _this.Vy.play();
           } else {
             _this.Vy.pause();
@@ -222,7 +355,7 @@
           if (ActiveEvents.MouseDownOnVideo) {
             ActiveEvents.MovingSlider = true;
             percent = _this.Vy.getSeekPercent(e.clientX);
-            _this.Vy.seekToPercent(percent);
+            _this.Vy.jumpToPercent(percent);
             return _this.Vy.movePlaySliderToPercent(percent);
           }
         };
@@ -239,7 +372,7 @@
       this.View.component('rewind').addEventListener('click', (function(_this) {
         return function(e) {
           e.stopPropagation();
-          return _this.Vy.seekToDuration(0);
+          return _this.Vy.rewind();
         };
       })(this));
       this.View.component('sound').addEventListener('click', (function(_this) {
@@ -260,13 +393,13 @@
       })(this));
       this.View.component('player').addEventListener('currenttimeupdate', (function(_this) {
         return function(e) {
-          return _this.Vy.movePlaySliderToPercent(_this.Vy.getCurrentTimePercent());
+          return _this.Vy.movePlaySliderToPercent(_this.Vy.elapsedPercent());
         };
       })(this));
       return setInterval((function(_this) {
         return function() {
           if (_this.Vy.isPlaying()) {
-            return _this.Vy.trigger('currenttimeupdate');
+            return _this.trigger('currenttimeupdate');
           }
         };
       })(this), 20);
@@ -279,16 +412,33 @@
   View = (function() {
     var buttonStructure, vyStructure;
 
-    vyStructure = '<div class="vy"> <div class="vy-title"></div> <div class="vy-positioner"> <video class="vy-placeholder"></video> </div> <div class="vy-controls"> <div class="vy-play"></div> <div class="vy-pause"></div> <div class="vy-buttons vy-buttons-left"></div> <div class="vy-buttons vy-buttons-right"></div> <div class="vy-play-slider"></div> <div class="vy-load-slider"></div> </div> </div>';
+    vyStructure = "<div class='vy'> <div class='vy-title'></div> <div class='vy-positioner'> <video class='vy-placeholder'></video> </div> <div class='vy-controls'> <div class='vy-play'></div> <div class='vy-pause'></div> <div class='vy-buttons vy-buttons-left'></div> <div class='vy-buttons vy-buttons-right'></div <div class='vy-play-slider'></div> <div class='vy-load-slider'></div> </div> </div>";
 
     buttonStructure = '<div class="vy-button"></div>';
 
     function View(original_video, settings) {
       this.componentCache = {};
+      console.log(this.buildComponentTree());
+      return;
       this.root = this.buildPlayer(original_video, settings);
       this.insertButtons(settings.buttons);
       this.insertTitle(settings.title);
     }
+
+    View.prototype.buildComponentTree = function() {
+      [['title', new Title(), [['positioner', new Positioner()]]], ['placeholder', new Placeholder()], ['controls', new Controls()], ['play', new Play()], ['pause', new Pause()], ['buttonsLeft', new Buttons('left')], ['buttonsRight', new Buttons('right')], ['playSlider', new Slider('play')], ['loadSlider', new Slider('load')]];
+      return [
+        {
+          title: new Title,
+          children: {
+            positioner: new Positioner(),
+            children: {
+              placeholder: new Placeholder()
+            }
+          }
+        }
+      ];
+    };
 
     View.prototype.buildPlayer = function(original_video, settings) {
       var placeholder, player, vy;

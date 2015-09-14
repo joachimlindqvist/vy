@@ -9,7 +9,10 @@ createElementFromString = (string) ->
     return temp.childNodes[0]
 
 offset = (elem) ->
-    alert 'implement offset()'
+    clientRect = elem.getBoundingClientRect()
+
+    top: clientRect.top + window.pageYOffset
+    left: clientRect.left + window.pageXOffset
 
 class @Vy
 
@@ -28,30 +31,25 @@ class @Vy
     hook: (el) =>
         el.vy = this
 
-    getCurrentTimePercent: ->
+    elapsedPercent: ->
+        @elapsedSeconds() / player.duration
+
+    elapsedSeconds: ->
+        @View.component('player').currentTime
+
+    jumpToPercent: (percent) ->
         player = @View.component('player')
-        player.currentTime / player.duration
+        @jumpToSecond(percent * player.duration)
 
-    movePlaySliderToPercent: (percent) ->
-        @moveSliderToPercent(@View.component('play-slider'), percent)
-
-    moveLoadSliderToPercent: (percent) ->
-        @moveSliderToPercent(@View.component('load-slider'), percent)
-
-    moveSliderToPercent: (slider, percent) ->
-        percent = 1 if percent >= 1
-        slider.style.right = "#{100 - (percent * 100)}%"
-
-    seekToPercent: (percent) ->
-        player = @View.component('player')
-        @seekToDuration(percent * player.duration)
-
-    seekToDuration: (duration) ->
+    jumpToSecond: (duration) ->
         @View.component('player').currentTime = duration
+
+    rewind: ->
+        @jumpToSecond(0)
 
     getSeekPercent: (mouseLeft) ->
         player = @View.component('player')
-        (mouseLeft - offset(player).left) / player.width()
+        (mouseLeft - offset(player).left) / player.offsetWidth
 
     play: -> @View.component('player').play()
 
@@ -65,14 +63,6 @@ class @Vy
         @View.component('player').removeAttribute('muted')
         @root.removeAttribute('muted')
 
-    enablePauseButton: ->
-        hide @View.component('play')
-        show @View.component('pause')
-
-    enablePlayButton: ->
-        hide @View.component('pause')
-        show @View.component('play')
-
     setAsPlaying: -> @View.root.setAttribute('playing', 'playing')
 
     setAsPaused: -> @View.root.removeAttribute('playing')
@@ -83,13 +73,9 @@ class @Vy
 
     toggleMute: -> if @isMuted() then @unmute() else @mute()
 
-    trigger: (eventName) ->
-        @View.component('player').dispatchEvent(new Event(eventName))
-
-
 window.addEventListener 'load', (e) ->
     for video in document.querySelectorAll('.vy-video')
-        settings = JSON.parse video.getAttribute('data-vy-settings')
+        settings = JSON.parse(video.getAttribute('data-vy-settings'))
         video.vy = new Vy(video, settings)
 
 if $?
