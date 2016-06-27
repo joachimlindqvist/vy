@@ -8,7 +8,11 @@ class @Vy
             </div>
             <div class="vy-controls">
                 <div class="vy-play"></div>
-                <div class="vy-pause"></div>
+                <div class="vy-pause">
+                    <div class="uil-flickr-css">
+                        <div></div><div></div>
+                    </div>
+                </div>
                 <div class="vy-buttons vy-buttons-left"></div>
                 <div class="vy-buttons vy-buttons-right"></div>
                 <div class="vy-play-slider"></div>
@@ -44,9 +48,12 @@ class @Vy
             e.preventDefault()
             @play()
 
+        @component('title').on 'click', (e) =>
+            e.preventDefault()
+            @play()
+
         @component('pause').on 'click', (e) =>
             e.preventDefault()
-
             if Events.MovingSlider
                 @seekToPercent(@getSeekPercent(e.clientX))
                 @play()
@@ -65,14 +72,13 @@ class @Vy
 
             if Events.MouseDownOnVideo
                 Events.MovingSlider = true;
+                @pause()
                 percent = @getSeekPercent(e.clientX)
-                @seekToPercent(percent);
-                @movePlaySliderToPercent(percent);
+                @seekToPercent(percent)
+                @movePlaySliderToPercent(percent)
 
         @component('player').on 'progress', (e) =>
-            currentPercent = this.buffered?.end(0);
-            if currentPercent isnt this.duration
-                self.moveLoadSliderToPercent(currentPercent)
+            @moveLoadSliderToPercent(@getCurrentLoadPercent())
 
         @component('rewind').on 'click', (e) =>
             e.stopPropagation()
@@ -87,8 +93,9 @@ class @Vy
             @enableControls()
 
         @component('player').on 'pause', (e) =>
-            @setAsPaused()
-            @enableTitle()
+            if !Events.MovingSlider
+                @setAsPaused()
+                @enableTitle()
 
         @component('player').on 'currenttimeupdate', (e) =>
             @movePlaySliderToPercent(@getCurrentTimePercent())
@@ -121,8 +128,13 @@ class @Vy
         @root.find ".vy-#{name}"
 
     getCurrentTimePercent: ->
-        player = @component('player').get(0)
-        player.currentTime / player.duration
+        @currentTime() / @duration()
+
+    getCurrentLoadPercent: ->
+        @buffered() / @duration()
+
+    timeLeft: ->
+        @duration() - @currentTime()
 
     movePlaySliderToPercent: (percent) ->
         percent = 1 if percent >= 1
@@ -133,17 +145,28 @@ class @Vy
         @component('load-slider').css 'right', "#{100 - (percent * 100)}%"
 
     seekToPercent: (percent) ->
-        player = @component('player').get(0)
-        @seekToDuration(percent * player.duration)
+        @seekToDuration(percent * @rawPlayer().duration)
 
     seekToDuration: (duration) ->
-        player = @component('player').get(0)
-        player.currentTime = duration
+        @rawPlayer().currentTime = duration
 
     getSeekPercent: (mouseLeft) ->
         player = @component('player')
         pos = player.offset()
         (mouseLeft - pos.left) / player.width()
+
+    rawPlayer: ->
+        @component('player').get(0)
+
+    buffered: ->
+        return 0 if @rawPlayer().buffered.length == 0
+        @rawPlayer().buffered.end(0)
+
+    duration: ->
+        @rawPlayer().duration
+
+    currentTime: ->
+        @rawPlayer().currentTime
 
     play: -> @component('player').get(0).play()
 
@@ -156,14 +179,6 @@ class @Vy
     unmute: ->
         @component('player').attr 'muted', null
         @root.attr 'muted', null
-
-    enablePauseButton: ->
-        @component('play').hide()
-        @component('pause').show()
-
-    enablePlayButton: ->
-        @component('pause').hide()
-        @component('play').show()
 
     enableControls: ->
         title = @component('title')

@@ -58,6 +58,9 @@
     right: 0;
     top: 0;
     bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .vy .vy-controls .vy-pause {
@@ -69,7 +72,7 @@
 }
 
 .vy[playing] .vy-controls .vy-pause {
-    display: block;
+    display: flex;
 }
 
 .vy .vy-controls .vy-buttons {
@@ -89,9 +92,9 @@
 }
 
 .vy .vy-controls .vy-buttons .vy-button {
-    margin: 0 0.5em 0.5em;
+    margin: 0 0.5em 0.75em;
     display: inline-block;
-    height: 1.75em;
+    height: 1.60em;
     line-height: 1.75em;
     background-size: 60%;
     background-repeat: no-repeat;
@@ -124,8 +127,10 @@
     position: absolute;
     top: 0;
     left: 0;
+    right: 100%;
     margin: 0;
     height: 0.3em;
+    transition: right linear;
 }
 
 .vy .vy-controls .vy-play-slider {
@@ -134,7 +139,7 @@
 }
 
 .vy .vy-controls .vy-load-slider {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.5);
     z-index: 3;
 }
 
@@ -174,4 +179,262 @@
 
 .vy[playing] .vy-title {
     //display: none;
+}
+
+@-webkit-keyframes uil-flickr-anim1 {
+  0% {
+    left: 0;
+  }
+  50% {
+    left: 100px;
+  }
+  100% {
+    left: 0;
+  }
+}
+@-webkit-keyframes uil-flickr-anim1 {
+  0% {
+    left: 0;
+  }
+  50% {
+    left: 100px;
+  }
+  100% {
+    left: 0;
+  }
+}
+@-moz-keyframes uil-flickr-anim1 {
+  0% {
+    left: 0;
+  }
+  50% {
+    left: 100px;
+  }
+  100% {
+    left: 0;
+  }
+}
+@-ms-keyframes uil-flickr-anim1 {
+  0% {
+    left: 0;
+  }
+  50% {
+    left: 100px;
+  }
+  100% {
+    left: 0;
+  }
+}
+@-moz-keyframes uil-flickr-anim1 {
+  0% {
+    left: 0;
+  }
+  50% {
+    left: 100px;
+  }
+  100% {
+    left: 0;
+  }
+}
+@-webkit-keyframes uil-flickr-anim1 {
+  0% {
+    left: 0;
+  }
+  50% {
+    left: 100px;
+  }
+  100% {
+    left: 0;
+  }
+}
+@-o-keyframes uil-flickr-anim1 {
+  0% {
+    left: 0;
+  }
+  50% {
+    left: 100px;
+  }
+  100% {
+    left: 0;
+  }
+}
+@keyframes uil-flickr-anim1 {
+  0% {
+    left: 0;
+  }
+  50% {
+    left: 100px;
+  }
+  100% {
+    left: 0;
+  }
+}
+@-webkit-keyframes uil-flickr-anim2 {
+  0% {
+    left: 100px;
+    z-index: 1;
+  }
+  49% {
+    z-index: 1;
+  }
+  50% {
+    left: 0;
+    z-index: 10;
+  }
+  100% {
+    left: 100px;
+    z-index: 10;
+  }
+}
+@-webkit-keyframes uil-flickr-anim2 {
+  0% {
+    left: 100px;
+    z-index: 1;
+  }
+  49% {
+    z-index: 1;
+  }
+  50% {
+    left: 0;
+    z-index: 10;
+  }
+  100% {
+    left: 100px;
+    z-index: 10;
+  }
+}
+@-moz-keyframes uil-flickr-anim2 {
+  0% {
+    left: 100px;
+    z-index: 1;
+  }
+  49% {
+    z-index: 1;
+  }
+  50% {
+    left: 0;
+    z-index: 10;
+  }
+  100% {
+    left: 100px;
+    z-index: 10;
+  }
+}
+@-ms-keyframes uil-flickr-anim2 {
+  0% {
+    left: 100px;
+    z-index: 1;
+  }
+  49% {
+    z-index: 1;
+  }
+  50% {
+    left: 0;
+    z-index: 10;
+  }
+  100% {
+    left: 100px;
+    z-index: 10;
+  }
+}
+@-moz-keyframes uil-flickr-anim2 {
+  0% {
+    left: 100px;
+    z-index: 1;
+  }
+  49% {
+    z-index: 1;
+  }
+  50% {
+    left: 0;
+    z-index: 10;
+  }
+  100% {
+    left: 100px;
+    z-index: 10;
+  }
+}
+@-webkit-keyframes uil-flickr-anim2 {
+  0% {
+    left: 100px;
+    z-index: 1;
+  }
+  49% {
+    z-index: 1;
+  }
+  50% {
+    left: 0;
+    z-index: 10;
+  }
+  100% {
+    left: 100px;
+    z-index: 10;
+  }
+}
+@-o-keyframes uil-flickr-anim2 {
+  0% {
+    left: 100px;
+    z-index: 1;
+  }
+  49% {
+    z-index: 1;
+  }
+  50% {
+    left: 0;
+    z-index: 10;
+  }
+  100% {
+    left: 100px;
+    z-index: 10;
+  }
+}
+@keyframes uil-flickr-anim2 {
+  0% {
+    left: 100px;
+    z-index: 1;
+  }
+  49% {
+    z-index: 1;
+  }
+  50% {
+    left: 0;
+    z-index: 10;
+  }
+  100% {
+    left: 100px;
+    z-index: 10;
+  }
+}
+.uil-flickr-css {
+  background: none;
+  position: relative;
+  width: 200px;
+  height: 200px;
+  transform: scale(0.3);
+}
+.uil-flickr-css > div {
+  width: 100px;
+  height: 100px;
+  border-radius: 50px;
+  position: absolute;
+  top: 50px;
+}
+.uil-flickr-css > div:nth-of-type(1) {
+  left: 0;
+  background: #eee;
+  z-index: 5;
+  -ms-animation: uil-flickr-anim1 2s linear infinite;
+  -moz-animation: uil-flickr-anim1 2s linear infinite;
+  -webkit-animation: uil-flickr-anim1 2s linear infinite;
+  -o-animation: uil-flickr-anim1 2s linear infinite;
+  animation: uil-flickr-anim1 2s linear infinite;
+}
+.uil-flickr-css > div:nth-of-type(2) {
+  left: 100px;
+  background: #111;
+  -ms-animation: uil-flickr-anim2 2s linear infinite;
+  -moz-animation: uil-flickr-anim2 2s linear infinite;
+  -webkit-animation: uil-flickr-anim2 2s linear infinite;
+  -o-animation: uil-flickr-anim2 2s linear infinite;
+  animation: uil-flickr-anim2 2s linear infinite;
 }

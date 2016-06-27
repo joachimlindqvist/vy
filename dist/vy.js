@@ -2,7 +2,7 @@
   this.Vy = (function() {
     var ControlsAnimationSpeed, Events, buttonStructure, vyStructure;
 
-    vyStructure = '<div class="vy"> <div class="vy-title"></div> <div class="vy-positioner"> <video class="vy-placeholder"></video> </div> <div class="vy-controls"> <div class="vy-play"></div> <div class="vy-pause"></div> <div class="vy-buttons vy-buttons-left"></div> <div class="vy-buttons vy-buttons-right"></div> <div class="vy-play-slider"></div> <div class="vy-load-slider"></div> </div> </div>';
+    vyStructure = '<div class="vy"> <div class="vy-title"></div> <div class="vy-positioner"> <video class="vy-placeholder"></video> </div> <div class="vy-controls"> <div class="vy-play"></div> <div class="vy-pause"> <div class="uil-flickr-css"> <div></div><div></div> </div> </div> <div class="vy-buttons vy-buttons-left"></div> <div class="vy-buttons vy-buttons-right"></div> <div class="vy-play-slider"></div> <div class="vy-load-slider"></div> </div> </div>';
 
     buttonStructure = '<div class="vy-button"></div>';
 
@@ -41,6 +41,12 @@
           return _this.play();
         };
       })(this));
+      this.component('title').on('click', (function(_this) {
+        return function(e) {
+          e.preventDefault();
+          return _this.play();
+        };
+      })(this));
       this.component('pause').on('click', (function(_this) {
         return function(e) {
           e.preventDefault();
@@ -66,6 +72,7 @@
           e.preventDefault();
           if (Events.MouseDownOnVideo) {
             Events.MovingSlider = true;
+            _this.pause();
             percent = _this.getSeekPercent(e.clientX);
             _this.seekToPercent(percent);
             return _this.movePlaySliderToPercent(percent);
@@ -74,11 +81,7 @@
       })(this));
       this.component('player').on('progress', (function(_this) {
         return function(e) {
-          var currentPercent, ref;
-          currentPercent = (ref = _this.buffered) != null ? ref.end(0) : void 0;
-          if (currentPercent !== _this.duration) {
-            return self.moveLoadSliderToPercent(currentPercent);
-          }
+          return _this.moveLoadSliderToPercent(_this.getCurrentLoadPercent());
         };
       })(this));
       this.component('rewind').on('click', (function(_this) {
@@ -101,8 +104,10 @@
       })(this));
       this.component('player').on('pause', (function(_this) {
         return function(e) {
-          _this.setAsPaused();
-          return _this.enableTitle();
+          if (!Events.MovingSlider) {
+            _this.setAsPaused();
+            return _this.enableTitle();
+          }
         };
       })(this));
       this.component('player').on('currenttimeupdate', (function(_this) {
@@ -162,9 +167,15 @@
     };
 
     Vy.prototype.getCurrentTimePercent = function() {
-      var player;
-      player = this.component('player').get(0);
-      return player.currentTime / player.duration;
+      return this.currentTime() / this.duration();
+    };
+
+    Vy.prototype.getCurrentLoadPercent = function() {
+      return this.buffered() / this.duration();
+    };
+
+    Vy.prototype.timeLeft = function() {
+      return this.duration() - this.currentTime();
     };
 
     Vy.prototype.movePlaySliderToPercent = function(percent) {
@@ -182,15 +193,11 @@
     };
 
     Vy.prototype.seekToPercent = function(percent) {
-      var player;
-      player = this.component('player').get(0);
-      return this.seekToDuration(percent * player.duration);
+      return this.seekToDuration(percent * this.rawPlayer().duration);
     };
 
     Vy.prototype.seekToDuration = function(duration) {
-      var player;
-      player = this.component('player').get(0);
-      return player.currentTime = duration;
+      return this.rawPlayer().currentTime = duration;
     };
 
     Vy.prototype.getSeekPercent = function(mouseLeft) {
@@ -198,6 +205,25 @@
       player = this.component('player');
       pos = player.offset();
       return (mouseLeft - pos.left) / player.width();
+    };
+
+    Vy.prototype.rawPlayer = function() {
+      return this.component('player').get(0);
+    };
+
+    Vy.prototype.buffered = function() {
+      if (this.rawPlayer().buffered.length === 0) {
+        return 0;
+      }
+      return this.rawPlayer().buffered.end(0);
+    };
+
+    Vy.prototype.duration = function() {
+      return this.rawPlayer().duration;
+    };
+
+    Vy.prototype.currentTime = function() {
+      return this.rawPlayer().currentTime;
     };
 
     Vy.prototype.play = function() {
@@ -216,16 +242,6 @@
     Vy.prototype.unmute = function() {
       this.component('player').attr('muted', null);
       return this.root.attr('muted', null);
-    };
-
-    Vy.prototype.enablePauseButton = function() {
-      this.component('play').hide();
-      return this.component('pause').show();
-    };
-
-    Vy.prototype.enablePlayButton = function() {
-      this.component('pause').hide();
-      return this.component('play').show();
     };
 
     Vy.prototype.enableControls = function() {
